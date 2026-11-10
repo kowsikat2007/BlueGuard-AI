@@ -1,0 +1,85 @@
+{
+  "location": "Pichavaram, Cuddalore, Tamil Nadu",
+  "data_source": "OFFICIAL_DATA",
+  "data_source_label": "OFFICIAL ENVIRONMENTAL DATA",
+  "data_type": "ENVIRONMENTAL",
+  "wetland_type": "Estuarine Mangrove Wetland (Ramsar Site No. 2475)",
+  "area_ha": 1478.6,
+  "core_forest_ha": 1100.0,
+  "latitude": 11.428,
+  "longitude": 79.782,
+  "rainfall_mm": 1310.0,
+  "salinity_ppt": 21.5,
+  "salinity_range_ppt": "10.5 - 34.5",
+  "water_ph": 7.9,
+  "water_ph_range": "7.5 - 8.4",
+  "water_temp_c": 29.2,
+  "dissolved_oxygen_mg_l": 5.4,
+  "tidal_range_m": "0.2 - 0.7",
+  "estuary_system": "Vellar - Coleroon Estuarine Complex",
+  "islands_count": 51,
+  "tidal_channels_count": 4400,
+  "dominant_species": [
+    "Avicennia marina (Grey Mangrove)",
+    "Rhizophora apiculata (Tall Stilt Mangrove)",
+    "Rhizophora mucronata (Asiatic Mangrove)",
+    "Bruguiera cylindrica",
+    "Ceriops decandra"
+  ],
+  "seasonal_profiles": [
+    {
+      "season": "Post-Monsoon",
+      "period": "Jan - Mar",
+      "rainfall_mm": 110.0,
+      "salinity_ppt": 14.2,
+      "water_ph": 7.8,
+      "water_temp_c": 27.5
+    },
+    {
+      "season": "Summer",
+      "period": "Apr - Jun",
+      "rainfall_mm": 75.0,
+      "salinity_ppt": 32.8,
+      "water_ph": 8.3,
+      "water_temp_c": 31.8
+    },
+    {
+      "season": "Pre-Monsoon",
+      "period": "Jul - Sep",
+      "rainfall_mm": 175.0,
+      "salinity_ppt": 26.5,
+      "water_ph": 8.1,
+      "water_temp_c": 30.2
+    },
+    {
+      "season": "Monsoon",
+      "period": "Oct - Dec",
+      "rainfall_mm": 950.0,
+      "salinity_ppt": 12.5,
+      "water_ph": 7.6,
+      "water_temp_c": 27.2
+    }
+  ],
+  "official_sources": [
+    {
+      "organization": "Ramsar Convention on Wetlands",
+      "document": "Ramsar Information Sheet (RIS) — Site No. 2475 (Pichavaram Mangrove Wetland)",
+      "designation_date": "April 8, 2022",
+      "citation_url": "https://rsis.ramsar.org/ris/2475"
+    },
+    {
+      "organization": "Tamil Nadu Forest Department",
+      "document": "Working Plan for Pichavaram Reserved Forest & Coastal Wetland Conservation Area",
+      "authority": "Principal Chief Conservator of Forests, Tamil Nadu",
+      "reporting_period": "2021 - 2026"
+    },
+    {
+      "organization": "M. S. Swaminathan Research Foundation (MSSRF)",
+      "document": "Atlas of Mangrove Wetlands of India — Part 1: Tamil Nadu (Pichavaram Monograph)",
+      "publication": "MSSRF Coastal Wetlands Management Series",
+      "year": "2020"
+    }
+  ],
+  "last_verified": "2026-03-15",
+  "data_isolation_notice": "OFFICIAL REFERENCE DATA ONLY: Strictly isolated from real-time IoT hardware telemetry and simulated sensor feeds. No synthetic or generated sensor data is included in this baseline."
+}

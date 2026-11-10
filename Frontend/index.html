@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Mangrove System — IoT-Driven MRV &amp; Blue Carbon Registry</title>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Authentication Session Guard: Redirect unauthenticated visits to login.html -->
+  <script>
+    if (localStorage.getItem("mangrove_session") !== "true") {
+      window.location.replace("login.html");
+    }
+  </script>
+</head>
+
+<body>
+
+  <div class="app-layout">
+
+    <!-- ====================================================
+         LEFT NAVIGATION SIDEBAR (Enterprise Nature-Tech)
+    ===================================================== -->
+    <aside id="appSidebar" class="app-sidebar" aria-label="Main Navigation">
+
+      <!-- Sidebar Brand Header -->
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-logo-wrap">
+            <span class="brand-logo-icon">🌱</span>
+          </div>
+          <div class="brand-info">
+            <h1 class="brand-title">Smart Mangrove</h1>
+            <span class="brand-subtitle">Blue Carbon &amp; IoT Monitoring</span>
+          </div>
+        </div>
+        <button id="sidebarCloseBtn" class="sidebar-close-btn" type="button" aria-label="Close Navigation Menu">
+          ✕
+        </button>
+      </div>
+
+      <!-- Navigation Menu (10 Views) -->
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">MONITORING CONSOLE</div>
+        <ul class="sidebar-nav-list">
+          <li>
+            <button type="button" class="nav-btn active" data-view="view-dashboard">
+              <span class="nav-icon">📊</span>
+              <span class="nav-text">Dashboard</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-btn" data-view="view-history">
+              <span class="nav-icon">📜</span>
+              <span class="nav-text">History</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-btn" data-view="view-monitoring">
+              <span class="nav-icon">🌱</span>
+              <span class="nav-text">Mangrove Monitoring</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-btn" data-view="view-environmental">
+              <span class="nav-icon">📈</span>
+              <span class="nav-text">Environmental Data</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-btn" data-view="view-sensors">
+              <span class="nav-icon">📡</span>
+              <span class="nav-text">IoT Sensors</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-btn" data-view="view-blue-carbon">
+              <span class="nav-icon">🌿</span>
+              <span class="nav-text">Blue Carbon</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-btn" data-view="view-anchoring">
+              <span class="nav-icon">⚙️</span>
+              <span class="nav-text">Anchoring System</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-btn" data-view="view-simulator">
+              <span class="nav-icon">🎛️</span>
+              <span class="nav-text">Simulator Reading</span>
+              <span class="nav-pill nav-pill-demo">Demo</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-btn" data-view="view-alerts">
+              <span class="nav-icon">🚨</span>
+              <span class="nav-text">Alerts</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" class="nav-btn" data-view="view-reports">
+              <span class="nav-icon">📑</span>
+              <span class="nav-text">Reports</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Sidebar Bottom Area: User Profile & Logout -->
+      <div class="sidebar-bottom-area">
+        <div class="sidebar-user-card">
+          <div class="sidebar-user-avatar">👤</div>
+          <div class="sidebar-user-meta">
+            <strong id="sideMenuUser">Blue Guard</strong>
+            <span class="sidebar-user-role">System Administrator</span>
+          </div>
+          <button type="button" class="sidebar-quick-logout" id="sideMenuLogoutBtn" title="Log out">
+            🚪
+          </button>
+        </div>
+
+        <div class="sidebar-station-info">
+          <span class="station-pulse-dot"></span>
+          <span class="station-name">Pichavaram Ramsar Site No. 2475</span>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Mobile Navigation Drawer Overlay Backdrop -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
+
+    <!-- ====================================================
+         MAIN CONTENT AREA WRAPPER
+    ===================================================== -->
+    <div class="app-main-wrapper">
+
+      <!-- Top Header Navigation Bar -->
+      <header class="app-header">
+        <div class="header-left">
+          <!-- Left-Side Three-Dot Navigation Button (⋮) -->
+          <button id="navToggleBtn" class="nav-toggle-btn nav-three-dot-btn" type="button"
+            aria-label="Open navigation menu" aria-expanded="false" title="Navigation Menu">
+            <span class="nav-three-dot-icon">⋮</span>
+          </button>
+
+          <div class="header-breadcrumb">
+            <div class="header-titles">
+              <div class="breadcrumb-row">
+                <span class="breadcrumb-org">SMART MANGROVE</span>
+                <span class="breadcrumb-sep">/</span>
+                <span id="currentViewTitle" class="breadcrumb-current">Dashboard</span>
+              </div>
+              <span id="currentViewSubtitle" class="header-subtitle">Real-time coastal wetland MRV &amp; automated root
+                stabilization</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Hardware Connection Status Indicator -->
+          <div id="hwHeaderBadge" class="hw-header-badge disconnected" title="Physical Hardware Status">
+            <span id="hwHeaderDot" class="hw-header-dot">⚪</span>
+            <span id="hwHeaderText">Hardware: Not Connected</span>
+          </div>
+
+          <!-- Alert Notification Bell -->
+          <button type="button" class="header-alert-btn" id="headerAlertBtn" title="View Active Alerts"
+            onclick="switchView('view-alerts')">
+            <span class="alert-bell-icon">🔔</span>
+            <span class="alert-count-pip">0</span>
+          </button>
+
+          <!-- User Session Profile with Dropdown Menu -->
+          <div class="header-profile-menu-wrapper" id="profileMenuWrapper">
+            <button type="button" class="header-user-profile-btn" id="userProfileBtn" aria-haspopup="true"
+              aria-expanded="false" title="Account Menu">
+              <span class="user-avatar-small">👤</span>
+              <span id="loggedInUser" class="header-username">Blue Guard</span>
+              <span class="profile-chevron">▾</span>
+            </button>
+            <div class="profile-dropdown-menu" id="profileDropdown" role="menu" aria-hidden="true">
+              <div class="profile-dropdown-header">
+                <strong>Blue Guard</strong>
+                <small>System Administrator</small>
+              </div>
+              <div class="profile-dropdown-divider"></div>
+              <button type="button" class="profile-dropdown-item dropdown-logout-item" id="logoutBtn" role="menuitem">
+                <span class="dropdown-item-icon">🚪</span>
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Container with Independent Views -->
+      <main class="app-content-body">
+
+        <!-- ====================================================
+             1. DASHBOARD VIEW (Active by default)
+        ===================================================== -->
+        <section id="view-dashboard" class="app-view active" aria-labelledby="dashHeading">
+
+          <!-- Location & Station Overview Banner -->
+          <div class="overview-station-card">
+            <div class="station-meta-col">
+              <div class="station-badge-row">
+                <span class="station-eyebrow">MONITORING STATION</span>
+                <span class="station-ramsar-pill">Ramsar Site No. 2475</span>
+              </div>
+              <h2 id="dashHeading">📍 Pichavaram, Cuddalore, Tamil Nadu</h2>
+              <p>
+                Continuous environmental MRV surveillance &amp; intelligent root stability monitoring for coastal
+                mangrove ecosystems.
+              </p>
+            </div>
+            <div class="station-health-badge">
+              <span class="station-health-dot"></span>
+              <div>
+                <strong>Monitoring System Ready</strong>
+                <small>Estuarine Wetland Ramsar Site No. 2475</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Executive KPI Overview Grid (6 Metric Cards) -->
+          <div class="dashboard-kpi-grid">
+
+            <!-- KPI 1: Monitored Area -->
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-icon-wrap emerald">🗺️</span>
+                <span class="kpi-trend-pill positive">● 51 Islets</span>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-label">TOTAL MONITORED WETLAND</span>
+                <h3 class="kpi-value">1,478.6 <small>ha</small></h3>
+                <span class="kpi-hint">1,100 ha Core Pichavaram Forest</span>
+              </div>
+            </div>
+
+            <!-- KPI 2: Environmental Health -->
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-icon-wrap teal">🌿</span>
+                <span class="kpi-trend-pill positive">● Optimal</span>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-label">ENVIRONMENTAL HEALTH</span>
+                <h3 class="kpi-value">98.4<small>%</small></h3>
+                <span class="kpi-hint">Rhizosphere Saturation &amp; Salinity (21.5 ppt)</span>
+              </div>
+            </div>
+
+            <!-- KPI 3: IoT Sensor Array -->
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-icon-wrap cyan">📡</span>
+                <span class="kpi-trend-pill neutral">● 6 Nodes</span>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-label">ACTIVE TELEMETRY CHANNELS</span>
+                <h3 class="kpi-value">6 <small>Sensors</small></h3>
+                <span class="kpi-hint">Tilt, Moisture, Temp, Humidity, Servo, Anchor</span>
+              </div>
+            </div>
+
+            <!-- KPI 4: Blue Carbon Stock -->
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-icon-wrap emerald">🌱</span>
+                <span class="kpi-trend-pill positive">+12.8%</span>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-label">BLUE CARBON SEQUESTRATION</span>
+                <h3 class="kpi-value">~185.4 <small>tCO₂e/ha</small></h3>
+                <span class="kpi-hint">Total Pool: ~274,132 t CO₂e Annual Sink</span>
+              </div>
+            </div>
+
+            <!-- KPI 5: Root Anchoring System -->
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-icon-wrap amber">⚙️</span>
+                <span class="kpi-trend-pill neutral">0° Standby</span>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-label">SUB-SURFACE ROOT ANCHOR</span>
+                <h3 class="kpi-value">Standby</h3>
+                <span class="kpi-hint">Dual-Axis Servo • &gt;15° Auto Deployment</span>
+              </div>
+            </div>
+
+            <!-- KPI 6: Active Safety Alerts -->
+            <div class="kpi-card">
+              <div class="kpi-card-header">
+                <span class="kpi-icon-wrap purple">🛡️</span>
+                <span class="kpi-trend-pill positive">✔ All Nominal</span>
+              </div>
+              <div class="kpi-card-body">
+                <span class="kpi-label">ACTIVE SAFETY ALERTS</span>
+                <h3 class="kpi-value">0 <small>Incidents</small></h3>
+                <span class="kpi-hint">All parameters within baseline safety envelope</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Hardware Status & Live Sensor Telemetry -->
+          <div class="view-section-card">
+
+            <div class="view-section-header">
+              <div>
+                <span class="section-badge">IoT HARDWARE TELEMETRY</span>
+                <h3>Real-Time Environmental Telemetry</h3>
+              </div>
+              <div class="header-aux-tags">
+                <span class="refresh-pill">● REFRESH INTERVAL (5s)</span>
+              </div>
+            </div>
+
+            <!-- Hardware Mode / Empty State Banner -->
+            <div id="dashSourceBanner" class="dash-source-banner mode-simulation">
+              <div class="dash-banner-left">
+                <span id="dashSourceDot" class="dash-source-dot">⚪</span>
+                <div class="dash-source-content">
+                  <strong id="dashSourceTitle">Hardware Not Connected</strong>
+                  <span id="dashSourceSubtitle">Latest hardware readings will appear when the device is
+                    connected.</span>
+                </div>
+              </div>
+              <div class="dash-banner-right">
+                <span id="dashLastUpdateTime" class="dash-update-badge">Hardware Status: Waiting for connection</span>
+              </div>
+            </div>
+
+            <!-- 6 Real-Time Telemetry Metric Cards -->
+            <div class="sensor-grid">
+
+              <!-- 1. Tilt Angle -->
+              <div class="sensor-card" id="cardTiltAngle">
+                <div class="sensor-card-top">
+                  <span class="sensor-card-icon">📐</span>
+                  <span class="card-source-tag not-connected" id="tagTilt">NOT CONNECTED</span>
+                </div>
+                <div class="sensor-card-body">
+                  <span class="sensor-card-label">Tilt Angle</span>
+                  <h3 id="dashTiltAngle">-- °</h3>
+                  <small class="sensor-card-hint">Safety threshold &lt; 15.0°</small>
+                </div>
+              </div>
+
+              <!-- 2. Soil Moisture -->
+              <div class="sensor-card" id="cardSoilMoisture">
+                <div class="sensor-card-top">
+                  <span class="sensor-card-icon">💧</span>
+                  <span class="card-source-tag not-connected" id="tagSoil">NOT CONNECTED</span>
+                </div>
+                <div class="sensor-card-body">
+                  <span class="sensor-card-label">Soil Moisture</span>
+                  <h3 id="dashSoilMoisture">-- %</h3>
+                  <small class="sensor-card-hint">Mangrove root hydration</small>
+                </div>
+              </div>
+
+              <!-- 3. Temperature -->
+              <div class="sensor-card" id="cardTemperature">
+                <div class="sensor-card-top">
+                  <span class="sensor-card-icon">🌡️</span>
+                  <span class="card-source-tag not-connected" id="tagTemp">NOT CONNECTED</span>
+                </div>
+                <div class="sensor-card-body">
+                  <span class="sensor-card-label">Temperature</span>
+                  <h3 id="dashTemperature">-- °C</h3>
+                  <small class="sensor-card-hint">Ambient coastal temperature</small>
+                </div>
+              </div>
+
+              <!-- 4. Humidity -->
+              <div class="sensor-card" id="cardHumidity">
+                <div class="sensor-card-top">
+                  <span class="sensor-card-icon">🌫️</span>
+                  <span class="card-source-tag not-connected" id="tagHum">NOT CONNECTED</span>
+                </div>
+                <div class="sensor-card-body">
+                  <span class="sensor-card-label">Humidity</span>
+                  <h3 id="dashHumidity">-- %</h3>
+                  <small class="sensor-card-hint">Relative atmospheric moisture</small>
+                </div>
+              </div>
+
+              <!-- 5. Servo Position -->
+              <div class="sensor-card" id="cardServoPosition">
+                <div class="sensor-card-top">
+                  <span class="sensor-card-icon">⚙️</span>
+                  <span class="card-source-tag not-connected" id="tagServo">NOT CONNECTED</span>
+                </div>
+                <div class="sensor-card-body">
+                  <span class="sensor-card-label">Servo Position</span>
+                  <h3 id="dashServoPosition">-- °</h3>
+                  <small class="sensor-card-hint">0° Standby • 90° Deployed</small>
+                </div>
+              </div>
+
+              <!-- 6. Anchor Status -->
+              <div class="sensor-card" id="cardAnchorStatus">
+                <div class="sensor-card-top">
+                  <span class="sensor-card-icon">⚓</span>
+                  <span class="card-source-tag not-connected" id="tagAnchor">NOT CONNECTED</span>
+                </div>
+                <div class="sensor-card-body">
+                  <span class="sensor-card-label">Anchor Status</span>
+                  <h3 id="dashAnchorStatus">--</h3>
+                  <small class="sensor-card-hint">NORMAL or ACTIVE</small>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- State Notice Banner -->
+            <div id="dashStateMessage" class="dash-state-message" style="display: none;"></div>
+
+          </div>
+
+          <!-- Analytical Telemetry Trend Graphs (Historical Data) -->
+          <div class="view-section-card">
+            <div class="view-section-header">
+              <div>
+                <span class="section-badge">TELEMETRY ANALYTICS</span>
+                <h3>Sensor Telemetry Trends</h3>
+              </div>
+              <span class="refresh-pill">HISTORICAL LOGS</span>
+            </div>
+
+            <div class="chart-grid three-chart-grid">
+              <!-- 1. Tilt Graph -->
+              <div class="chart-card">
+                <div class="chart-card-header">
+                  <h4>📐 Tilt Angle Trend</h4>
+                  <span class="chart-metric-tag" id="chartTiltLatest">-- °</span>
+                </div>
+                <div class="chart-container" id="containerTiltChart">
+                  <canvas id="tiltChart"></canvas>
+                </div>
+                <div class="chart-card-footer">
+                  <small>X: Timestamp • Y: Tilt Angle (°)</small>
+                </div>
+              </div>
+
+              <!-- 2. Soil Moisture Graph -->
+              <div class="chart-card">
+                <div class="chart-card-header">
+                  <h4>💧 Soil Moisture Trend</h4>
+                  <span class="chart-metric-tag" id="chartSoilLatest">-- %</span>
+                </div>
+                <div class="chart-container" id="containerSoilChart">
+                  <canvas id="soilChart"></canvas>
+                </div>
+                <div class="chart-card-footer">
+                  <small>X: Timestamp • Y: Soil Moisture (%)</small>
+                </div>
+              </div>
+
+              <!-- 3. Temperature Graph -->
+              <div class="chart-card">
+                <div class="chart-card-header">
+                  <h4>🌡️ Temperature Trend</h4>
+                  <span class="chart-metric-tag" id="chartTempLatest">-- °C</span>
+                </div>
+                <div class="chart-container" id="containerTempChart">
+                  <canvas id="tempChart"></canvas>
+                </div>
+                <div class="chart-card-footer">
+                  <small>X: Timestamp • Y: Temperature (°C)</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Readings Table -->
+          <div class="view-section-card">
+            <div class="recent-readings-header">
+              <div>
+                <h3>📋 Recent Telemetry Feed</h3>
+                <small>Stored readings synchronized with the system audit database</small>
+              </div>
+              <div class="recent-header-badges">
+                <span class="recent-count-badge" id="recentReadingsCount">0 records</span>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="recent-table">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Source</th>
+                    <th>Tilt</th>
+                    <th>Soil Moisture</th>
+                    <th>Temperature</th>
+                    <th>Anchor Status</th>
+                  </tr>
+                </thead>
+                <tbody id="recentReadingsBody">
+                  <tr>
+                    <td colspan="6" class="recent-state-cell">Loading recent readings from database...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+
+
+        <!-- ====================================================
+             2. HISTORY VIEW
+        ===================================================== -->
+        <section id="view-history" class="app-view" aria-labelledby="historyHeading">
+
+          <div class="view-section-card">
+            <div class="view-section-header">
+              <div>
+                <span class="section-badge">AUDIT DATABASE</span>
+                <h2 id="historyHeading">📜 Telemetry Reading History</h2>
+                <p class="section-description">Complete chronological audit log of all recorded hardware and simulation
+                  telemetry.</p>
+              </div>
+              <div class="history-meta-badges">
+                <span id="historyRecordCount" class="history-count-badge">0 records</span>
+              </div>
+            </div>
+
+            <!-- History Controls: Search, Source Filter, Refresh -->
+            <div class="history-controls-bar">
+              <div class="history-search-group">
+                <span class="history-search-icon">🔍</span>
+                <input type="text" id="historySearchInput" class="history-search-input"
+                  placeholder="Search by ID, timestamp, tilt, status..." aria-label="Search telemetry history" />
+                <button id="historyClearSearchBtn" class="history-clear-btn" type="button"
+                  title="Clear search">✕</button>
+              </div>
+
+              <div class="history-filter-group">
+                <label for="historySourceFilter" class="history-filter-label">Source:</label>
+                <select id="historySourceFilter" class="history-filter-select" aria-label="Filter readings by source">
+                  <option value="ALL">All Sources</option>
+                  <option value="HARDWARE">HARDWARE Only</option>
+                  <option value="SIMULATION">SIMULATION Only</option>
+                </select>
+              </div>
+
+              <button id="refreshHistoryBtn" class="btn-refresh" type="button" title="Reload readings from database">
+                <span class="refresh-icon">🔄</span>
+                <span>Refresh</span>
+              </button>
+            </div>
+
+            <!-- History Data Table (9 Columns) -->
+            <div class="table-responsive">
+              <table class="history-data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Date &amp; Time</th>
+                    <th>Source</th>
+                    <th>Tilt Angle</th>
+                    <th>Soil Moisture</th>
+                    <th>Temperature</th>
+                    <th>Humidity</th>
+                    <th>Servo Position</th>
+                    <th>Anchor Status</th>
+                  </tr>
+                </thead>
+                <tbody id="historyTable">
+                  <tr>
+                    <td colspan="9" class="table-state-cell loading">
+                      <div class="table-state-content">
+                        <span class="spinner-dot">⏳</span>
+                        <span>Loading stored readings from database...</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ====================================================
+             3. MANGROVE MONITORING VIEW
+        ===================================================== -->
+        <section id="view-monitoring" class="app-view" aria-labelledby="monitoringHeading">
+
+          <div class="view-section-card">
+            <div class="view-section-header">
+              <div>
+                <span class="section-badge">ECOLOGICAL SURVEILLANCE</span>
+                <h2 id="monitoringHeading">🌱 Mangrove Ecosystem Monitoring</h2>
+                <p class="section-description">Bio-shield preservation, canopy index, and intelligent plant
+                  stabilization framework.</p>
+              </div>
+            </div>
+
+            <div class="overview-station-card">
+              <div class="station-meta-col">
+                <span class="station-eyebrow">PRIMARY SITE COORDINATES</span>
+                <h3>📍 Pichavaram Mangrove Forest, Tamil Nadu</h3>
+                <p>
+                  Latitude: <strong>11.428° N</strong> • Longitude: <strong>79.782° E</strong> • Core Protected Zone:
+                  <strong>1,478.6 ha</strong>
+                </p>
+                <p>
+                  Pichavaram mangrove wetland acts as a critical natural bio-shield protecting Cuddalore's shoreline
+                  from extreme storm surges, cyclones, and soil erosion while providing nursery grounds for coastal
+                  marine fauna.
+                </p>
+              </div>
+            </div>
+
+            <!-- Protection Process Workflow -->
+            <div class="process-section-title">
+              <h3>Intelligent Automated Protection Workflow</h3>
+              <p>Closed-loop sensing and servo-actuated root anchoring mechanism.</p>
+            </div>
+
+            <div class="process-container">
+              <div class="process-step">
+                <div class="process-number">1</div>
+                <div class="process-icon">🌱</div>
+                <h4>Young Mangrove</h4>
+                <p>Sapling planted in high-tide estuarine sediment</p>
+              </div>
+              <div class="process-arrow">→</div>
+              <div class="process-step">
+                <div class="process-number">2</div>
+                <div class="process-icon">📡</div>
+                <h4>Telemetry Sensing</h4>
+                <p>MPU6050 &amp; moisture sensors continuously monitor stability</p>
+              </div>
+              <div class="process-arrow">→</div>
+              <div class="process-step">
+                <div class="process-number">3</div>
+                <div class="process-icon">⚠️</div>
+                <h4>Risk Evaluation</h4>
+                <p>Tilt &gt; 15° triggers high risk of sapling uprooting</p>
+              </div>
+              <div class="process-arrow">→</div>
+              <div class="process-step">
+                <div class="process-number">4</div>
+                <div class="process-icon">⚙️</div>
+                <h4>Anchor Deployment</h4>
+                <p>Servo engages sub-surface stabilization anchor</p>
+              </div>
+            </div>
+
+            <!-- Ecological Biodiversity Cards -->
+            <div class="species-grid">
+              <div class="species-card">
+                <h4>Avicennia marina (Grey Mangrove)</h4>
+                <span class="species-tag">~70% Forest Coverage</span>
+                <p>Dominant halophytic pioneer species equipped with vertical pneumatophores (pencil roots) for
+                  rhizosphere gas exchange in anoxic mud.</p>
+              </div>
+              <div class="species-card">
+                <h4>Rhizophora mucronata (True Mangrove)</h4>
+                <span class="species-tag">Core Canal Fringe</span>
+                <p>Characterized by intricate stilt roots (prop roots) that dissipate wave hydrodynamic energy and trap
+                  organic blue carbon sediment.</p>
+              </div>
+              <div class="species-card">
+                <h4>Bruguiera cylindrica</h4>
+                <span class="species-tag">Higher Salinity Islets</span>
+                <p>Knee-root mangrove adapted to hyper-saline intertidal zones, contributing substantially to
+                  belowground root carbon sequestration.</p>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ====================================================
+             4. ENVIRONMENTAL DATA VIEW
+        ===================================================== -->
+        <section id="view-environmental" class="app-view" aria-labelledby="envHeading">
+
+          <div class="view-section-card">
+            <div class="view-section-header">
+              <div>
+                <span class="section-badge env-source-pill">🏛️ OFFICIAL ENVIRONMENTAL DATA</span>
+                <h2 id="envHeading">Official Environmental Data</h2>
+                <p class="section-description">📍 <strong>Pichavaram, Cuddalore, Tamil Nadu</strong> • Estuarine
+                  Mangrove Wetland (Ramsar Site No. 2475)</p>
+              </div>
+              <div class="env-source-badge-wrap">
+                <span class="official-verified-badge">✔ VERIFIED BASELINE</span>
+              </div>
+            </div>
+
+            <!-- Strict Data Separation Notice -->
+            <div class="env-data-banner">
+              <div class="env-banner-icon">📜</div>
+              <div class="env-banner-content">
+                <div class="env-banner-header">
+                  <strong>OFFICIAL REFERENCE DATASET</strong>
+                  <span class="env-tag-isolated">ISOLATED SCIENTIFIC BASELINE</span>
+                </div>
+                <p>
+                  This section provides verified ecological, geographical, and hydrologic reference metrics for the
+                  Pichavaram Mangrove Wetland.
+                  <strong>Strict Data Separation:</strong> This official dataset is maintained independently and is
+                  <em>never mixed</em> with live or simulated IoT sensor readings (SIMULATION / HARDWARE).
+                </p>
+              </div>
+            </div>
+
+            <!-- 6 Verified Metric Cards -->
+            <div class="env-cards-grid">
+              <!-- 1. Area -->
+              <div class="env-card">
+                <div class="env-card-top">
+                  <span class="env-icon">🗺️</span>
+                  <span class="env-verified-tag">OFFICIAL</span>
+                </div>
+                <div class="env-card-body">
+                  <span class="env-card-label">Mangrove Wetland Area</span>
+                  <h3 id="envArea">1,478.6 ha</h3>
+                  <small class="env-card-hint">Total Ramsar Site • 1,100 ha Core Forest</small>
+                </div>
+              </div>
+
+              <!-- 2. Latitude -->
+              <div class="env-card">
+                <div class="env-card-top">
+                  <span class="env-icon">🌐</span>
+                  <span class="env-verified-tag">GPS COORD</span>
+                </div>
+                <div class="env-card-body">
+                  <span class="env-card-label">Latitude</span>
+                  <h3 id="envLatitude">11.428° N</h3>
+                  <small class="env-card-hint">Geographical coordinate (11° 25' 40" N)</small>
+                </div>
+              </div>
+
+              <!-- 3. Longitude -->
+              <div class="env-card">
+                <div class="env-card-top">
+                  <span class="env-icon">🧭</span>
+                  <span class="env-verified-tag">GPS COORD</span>
+                </div>
+                <div class="env-card-body">
+                  <span class="env-card-label">Longitude</span>
+                  <h3 id="envLongitude">79.782° E</h3>
+                  <small class="env-card-hint">Geographical coordinate (79° 46' 55" E)</small>
+                </div>
+              </div>
+
+              <!-- 4. Rainfall -->
+              <div class="env-card">
+                <div class="env-card-top">
+                  <span class="env-icon">🌧️</span>
+                  <span class="env-verified-tag">ANNUAL AVG</span>
+                </div>
+                <div class="env-card-body">
+                  <span class="env-card-label">Annual Rainfall</span>
+                  <h3 id="envRainfall">1,310 mm</h3>
+                  <small class="env-card-hint">Monsoon Peak: ~950 mm (Oct–Dec)</small>
+                </div>
+              </div>
+
+              <!-- 5. Salinity -->
+              <div class="env-card">
+                <div class="env-card-top">
+                  <span class="env-icon">🧂</span>
+                  <span class="env-verified-tag">BASELINE</span>
+                </div>
+                <div class="env-card-body">
+                  <span class="env-card-label">Estuarine Salinity</span>
+                  <h3 id="envSalinity">21.5 ppt</h3>
+                  <small class="env-card-hint">Seasonal Range: 10.5 – 34.5 ppt</small>
+                </div>
+              </div>
+
+              <!-- 6. Water pH -->
+              <div class="env-card">
+                <div class="env-card-top">
+                  <span class="env-icon">🧪</span>
+                  <span class="env-verified-tag">HYDROLOGY</span>
+                </div>
+                <div class="env-card-body">
+                  <span class="env-card-label">Water pH</span>
+                  <h3 id="envWaterPh">7.9</h3>
+                  <small class="env-card-hint">Alkaline Brackish • Range: 7.5 – 8.4</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ecosystem Seasonal Chart -->
+            <div class="env-chart-card">
+              <div class="env-chart-header">
+                <div>
+                  <h3>📊 Seasonal Environmental Profile (Pichavaram Mangrove)</h3>
+                  <small>Official seasonal correlation: Rainfall (mm) vs. Estuarine Salinity (ppt)</small>
+                </div>
+                <span class="env-chart-type-pill">Official Ecological Survey Data</span>
+              </div>
+              <div class="env-chart-container">
+                <canvas id="envSeasonalChart"></canvas>
+              </div>
+              <div class="env-chart-legend-notes">
+                <p>
+                  <em>Ecological Observation:</em> During the Northeast Monsoon (Oct–Dec), massive freshwater inflows
+                  lower salinity to ~12.5 ppt. In the dry summer (Apr–Jun), intense evaporation elevates salinity up to
+                  ~32.8 ppt.
+                </p>
+              </div>
+            </div>
+
+            <!-- Verification Citations -->
+            <div class="env-sources-panel">
+              <div class="env-sources-header">
+                <h3>📚 Official Data Sources &amp; Verification References</h3>
+                <small>Verified scientific baseline documentation</small>
+              </div>
+              <div class="env-sources-list">
+                <div class="env-source-item">
+                  <span class="source-item-num">01</span>
+                  <div class="source-item-body">
+                    <strong>Ramsar Convention on Wetlands (UNESCO)</strong>
+                    <p>Ramsar Information Sheet (RIS) — Site No. 2475: <em>Pichavaram Mangrove Wetland</em> (Designated
+                      April 2022).</p>
+                  </div>
+                </div>
+                <div class="env-source-item">
+                  <span class="source-item-num">02</span>
+                  <div class="source-item-body">
+                    <strong>Tamil Nadu Forest Department (Wildlife &amp; Wetlands Wing)</strong>
+                    <p>Pichavaram Reserved Forest Comprehensive Management Plan (2021–2026). Geospatial land-use
+                      mapping.</p>
+                  </div>
+                </div>
+                <div class="env-source-item">
+                  <span class="source-item-num">03</span>
+                  <div class="source-item-body">
+                    <strong>M. S. Swaminathan Research Foundation (MSSRF)</strong>
+                    <p>Atlas of Mangrove Wetlands of India (Part 1: Tamil Nadu) — <em>Pichavaram Mangrove
+                        Monograph</em>.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ====================================================
+             5. IOT SENSORS VIEW
+        ===================================================== -->
+        <section id="view-sensors" class="app-view" aria-labelledby="sensorsHeading">
+
+          <div class="view-section-card">
+            <div class="view-section-header">
+              <div>
+                <span class="section-badge">HARDWARE TELEMETRY SPECIFICATIONS</span>
+                <h2 id="sensorsHeading">📡 IoT Sensor Node Architecture</h2>
+                <p class="section-description">Dedicated sensor array for monitoring mangrove physical stability and
+                  soil rhizosphere conditions.</p>
+              </div>
+              <div id="sensorHardwareStatusChip" class="status-chip neutral">Hardware: Not Connected</div>
+            </div>
+
+            <div class="sensor-hardware-grid">
+              <!-- 1. MPU-6050 6-DOF Sensor -->
+              <div class="hardware-spec-card">
+                <div class="spec-header">
+                  <span class="spec-icon spec-icon-cyan">📐</span>
+                  <div class="spec-title-wrap">
+                    <h4>MPU-6050 6-DOF Sensor</h4>
+                    <small>Tilt Angle &amp; Inertial Motion</small>
+                  </div>
+                  <span class="spec-badge">I2C (0x68)</span>
+                </div>
+                <div class="spec-details">
+                  <div class="spec-row"><span>Measurement:</span><strong>Roll &amp; Pitch (Tilt Angle)</strong></div>
+                  <div class="spec-row"><span>Operational Range:</span><strong>0.0° – 90.0° Precision Tilt</strong>
+                  </div>
+                  <div class="spec-row"><span>Trigger Envelope:</span><strong class="spec-highlight-warn">&gt; 15.0°
+                      triggers Anchor</strong></div>
+                  <div class="spec-row"><span>Sampling &amp; Filter:</span><strong>Digital Low-Pass Filter
+                      (DLPF)</strong></div>
+                  <div class="spec-row"><span>Arduino Pinout:</span><strong>SDA (A4), SCL (A5)</strong></div>
+                </div>
+              </div>
+
+              <!-- 2. Capacitive Soil Moisture Sensor -->
+              <div class="hardware-spec-card">
+                <div class="spec-header">
+                  <span class="spec-icon spec-icon-emerald">💧</span>
+                  <div class="spec-title-wrap">
+                    <h4>Capacitive Soil Moisture Sensor</h4>
+                    <small>Rhizosphere Saturation &amp; Salinity</small>
+                  </div>
+                  <span class="spec-badge">Analog (A0)</span>
+                </div>
+                <div class="spec-details">
+                  <div class="spec-row"><span>Measurement:</span><strong>Dielectric Soil Permittivity</strong></div>
+                  <div class="spec-row"><span>Nominal Range:</span><strong>60% – 85% Saturation</strong></div>
+                  <div class="spec-row"><span>Probe Construction:</span><strong>Corrosion-Resistant PCB</strong></div>
+                  <div class="spec-row"><span>Output Signal:</span><strong>1.2V – 3.0V Analog Signal</strong></div>
+                  <div class="spec-row"><span>Arduino Pinout:</span><strong>Analog Input A0</strong></div>
+                </div>
+              </div>
+
+              <!-- 3. DHT-22 / DS18B20 -->
+              <div class="hardware-spec-card">
+                <div class="spec-header">
+                  <span class="spec-icon spec-icon-teal">🌡️</span>
+                  <div class="spec-title-wrap">
+                    <h4>DHT-22 / DS18B20</h4>
+                    <small>Canopy Temperature &amp; Humidity</small>
+                  </div>
+                  <span class="spec-badge">1-Wire (D2)</span>
+                </div>
+                <div class="spec-details">
+                  <div class="spec-row"><span>Temperature Range:</span><strong>-40°C to +80°C (±0.5°C)</strong></div>
+                  <div class="spec-row"><span>Relative Humidity:</span><strong>0% to 100% RH (±2% RH)</strong></div>
+                  <div class="spec-row"><span>Sensor Enclosure:</span><strong>IP67 Vented Canopy Housing</strong></div>
+                  <div class="spec-row"><span>Refresh Cadence:</span><strong>2.0-Second Sampling Interval</strong></div>
+                  <div class="spec-row"><span>Arduino Pinout:</span><strong>Digital Pin 2 (1-Wire Bus)</strong></div>
+                </div>
+              </div>
+
+              <!-- 4. Servo Motor Actuator -->
+              <div class="hardware-spec-card">
+                <div class="spec-header">
+                  <span class="spec-icon spec-icon-amber">⚙️</span>
+                  <div class="spec-title-wrap">
+                    <h4>Servo Motor</h4>
+                    <small>Submersible Deployment Actuator</small>
+                  </div>
+                  <span class="spec-badge">PWM 50Hz (D9)</span>
+                </div>
+                <div class="spec-details">
+                  <div class="spec-row"><span>Standby Baseline:</span><strong>0° (Disengaged / Normal)</strong></div>
+                  <div class="spec-row"><span>Deployment Angle:</span><strong class="spec-highlight-alert">90° (Anchors
+                      Extended)</strong></div>
+                  <div class="spec-row"><span>Control Protocol:</span><strong>50Hz Pulse Width Modulation</strong></div>
+                  <div class="spec-row"><span>Stall Torque:</span><strong>13.0 kg-cm @ 5.0V External</strong></div>
+                  <div class="spec-row"><span>Arduino Pinout:</span><strong>Digital Pin 9 (PWM)</strong></div>
+                </div>
+              </div>
+
+              <!-- 5. Anchoring / Tilt System -->
+              <div class="hardware-spec-card">
+                <div class="spec-header">
+                  <span class="spec-icon spec-icon-purple">⚓</span>
+                  <div class="spec-title-wrap">
+                    <h4>Anchoring / Tilt System</h4>
+                    <small>Automated Closed-Loop Stabilization</small>
+                  </div>
+                  <span class="spec-badge">Auto-Intervention</span>
+                </div>
+                <div class="spec-details">
+                  <div class="spec-row"><span>Stabilization Trigger:</span><strong class="spec-highlight-alert">Tilt
+                      &gt; 15.0° Threshold</strong></div>
+                  <div class="spec-row"><span>Mechanical Action:</span><strong>Subsurface Fluke Penetration</strong>
+                  </div>
+                  <div class="spec-row"><span>Response Latency:</span><strong>&lt; 250 ms Fast Engagement</strong></div>
+                  <div class="spec-row"><span>Substrate Anchor:</span><strong>Marine Grade 316 Stainless</strong></div>
+                  <div class="spec-row"><span>Supervisory Link:</span><strong>Closed-Loop Hardware Interrupt</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Future Arduino UNO Wiring Guide -->
+            <div class="wiring-guide-card">
+              <h4>🔌 Arduino UNO Hardware Pin Assignment &amp; Telemetry Bus</h4>
+              <div class="wiring-table-wrap">
+                <table class="wiring-table">
+                  <thead>
+                    <tr>
+                      <th>Sensor / Actuator Module</th>
+                      <th>Signal Type</th>
+                      <th>Arduino UNO Pin</th>
+                      <th>VCC / GND</th>
+                      <th>Operational Function</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>MPU-6050 6-DOF Sensor</td>
+                      <td>I2C Data / Clock</td>
+                      <td>SDA (A4), SCL (A5)</td>
+                      <td>3.3V / GND</td>
+                      <td>Continuous sapling lean &amp; surge tilt monitoring</td>
+                    </tr>
+                    <tr>
+                      <td>Capacitive Soil Moisture v1.2</td>
+                      <td>Analog Voltage</td>
+                      <td>Analog Pin A0</td>
+                      <td>5.0V / GND</td>
+                      <td>Rhizosphere sediment moisture &amp; tidal saturation</td>
+                    </tr>
+                    <tr>
+                      <td>DHT-22 / DS18B20 Temp/Hum</td>
+                      <td>1-Wire Digital</td>
+                      <td>Digital Pin 2</td>
+                      <td>5.0V / GND</td>
+                      <td>Canopy microclimate temperature &amp; humidity</td>
+                    </tr>
+                    <tr>
+                      <td>Servo Motor Actuator</td>
+                      <td>PWM Control</td>
+                      <td>Digital Pin 9</td>
+                      <td>5.0V (Ext) / GND</td>
+                      <td>Servo-driven mechanical root anchor actuation</td>
+                    </tr>
+                    <tr>
+                      <td>Subsurface Anchoring System</td>
+                      <td>Closed-Loop Mechanical</td>
+                      <td>Pin 9 + Sensor Bus</td>
+                      <td>Dual-Rail Isolated</td>
+                      <td>Automated soil anchor penetration upon &gt;15° tilt</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ====================================================
+             6. BLUE CARBON VIEW
+        ===================================================== -->
+        <section id="view-blue-carbon" class="app-view" aria-labelledby="blueCarbonHeading">
+
+          <div class="view-section-card">
+            <div class="view-section-header">
+              <div>
+                <span class="section-badge">CARBON REGISTRY &amp; MRV</span>
+                <h2 id="blueCarbonHeading">🌿 Blue Carbon Sequestration &amp; MRV Registry</h2>
+                <p class="section-description">High-integrity Measurement, Reporting, and Verification (MRV) for coastal
+                  wetland carbon sinks.</p>
+              </div>
+              <span class="status-chip success">Standard: IPCC Wetlands</span>
+            </div>
+
+            <!-- Key Carbon Accounting Metrics -->
+            <div class="carbon-metrics-grid">
+              <div class="carbon-metric-card">
+                <span class="carbon-label">TOTAL PROTECTED WETLAND AREA</span>
+                <h3>1,478.6 ha</h3>
+                <small>Pichavaram Ramsar Site No. 2475</small>
+              </div>
+              <div class="carbon-metric-card">
+                <span class="carbon-label">ESTIMATED SEQUESTRATION RATE</span>
+                <h3>~185.4 t CO₂e / ha / yr</h3>
+                <small>Aboveground &amp; Belowground Biomass</small>
+              </div>
+              <div class="carbon-metric-card">
+                <span class="carbon-label">TOTAL ANNUAL CARBON POOL</span>
+                <h3>~274,132 t CO₂e</h3>
+                <small>Annual Wetland Sequestration Capacity</small>
+              </div>
+              <div class="carbon-metric-card">
+                <span class="carbon-label">VERIFIED CARBON REGISTRY TOKEN</span>
+                <h3>VCC-PICH-2026</h3>
+                <small>Immutable On-Chain Verification Queue</small>
+              </div>
+            </div>
+
+            <!-- MRV Methodological Framework -->
+            <div class="mrv-framework-card">
+              <h4>Blue Carbon MRV Methodological Principles</h4>
+              <div class="mrv-pillars-grid">
+                <div class="mrv-pillar">
+                  <div class="pillar-icon">📏</div>
+                  <h5>Measurement</h5>
+                  <p>In-situ IoT sensors monitor sapling mortality and canopy tilt while satellite remote sensing
+                    calculates NDVI vegetation canopy coverage.</p>
+                </div>
+                <div class="mrv-pillar">
+                  <div class="pillar-icon">📑</div>
+                  <h5>Reporting</h5>
+                  <p>Standardized carbon accounting ledgers compiled in compliance with IPCC Guidelines for National
+                    Greenhouse Gas Inventories: Wetlands Supplement.</p>
+                </div>
+                <div class="mrv-pillar">
+                  <div class="pillar-icon">🔒</div>
+                  <h5>Verification</h5>
+                  <p>Third-party audit validation ensures additionality, permanence, and prevents double-counting before
+                    carbon offset credit minting.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Verified Carbon Credit Issuance Ledger -->
+            <div class="table-responsive">
+              <table class="recent-table">
+                <thead>
+                  <tr>
+                    <th>Vintage</th>
+                    <th>Registry ID</th>
+                    <th>Zone</th>
+                    <th>Area (ha)</th>
+                    <th>Gross Sequestration</th>
+                    <th>MRV Audit Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>2025-Q4</td>
+                    <td><code>VCC-TN-0482</code></td>
+                    <td>Vellar Estuary Fringe</td>
+                    <td>340.0 ha</td>
+                    <td>63,036 t CO₂e</td>
+                    <td><span class="badge-verified">✔ Audited &amp; Issued</span></td>
+                  </tr>
+                  <tr>
+                    <td>2025-Q3</td>
+                    <td><code>VCC-TN-0419</code></td>
+                    <td>Coleroon Canal Zone</td>
+                    <td>410.5 ha</td>
+                    <td>76,106 t CO₂e</td>
+                    <td><span class="badge-verified">✔ Audited &amp; Issued</span></td>
+                  </tr>
+                  <tr>
+                    <td>2026-Q1</td>
+                    <td><code>VCC-TN-0511</code></td>
+                    <td>Central Islet Cluster</td>
+                    <td>728.1 ha</td>
+                    <td>134,990 t CO₂e</td>
+                    <td><span class="badge-pending">⏳ Verification in Progress</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ====================================================
+             7. ANCHORING SYSTEM VIEW
+        ===================================================== -->
+        <section id="view-anchoring" class="app-view" aria-labelledby="anchoringHeading">
+
+          <div class="view-section-card">
+            <div class="view-section-header">
+              <div>
+                <span class="section-badge">MECHANICAL STABILIZATION</span>
+                <h2 id="anchoringHeading">⚙️ Automated Sub-surface Anchoring System</h2>
+                <p class="section-description">Servo-actuated root stabilization to prevent sapling dislodgment during
+                  storm surges.</p>
+              </div>
+              <span class="status-chip neutral" id="anchorViewChip">Standby Ready</span>
+            </div>
+
+            <!-- Protection Indicators -->
+            <div class="protection-grid">
+              <div class="protection-card">
+                <div class="protection-icon">🛡️</div>
+                <div>
+                  <span class="prot-label">Environmental Risk</span>
+                  <h3 id="riskLevel">NORMAL</h3>
+                  <small>Calculated from tilt, soil moisture &amp; tide</small>
+                </div>
+              </div>
+
+              <div class="protection-card">
+                <div class="protection-icon">⚓</div>
+                <div>
+                  <span class="prot-label">Automated Anchor</span>
+                  <h3 id="anchorStatus">NORMAL</h3>
+                  <small>Mechanical state (NORMAL / ACTIVE)</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Anchor Physical Cross-Section Visualization -->
+            <div class="anchor-system">
+              <div class="anchor-visual">
+                <div class="scene-title">Sub-surface Root Stabilization Cross-Section</div>
+
+                <div class="air-area">
+                  <div class="mangrove">
+                    <div class="plant-stem"></div>
+                    <div class="leaf leaf-1"></div>
+                    <div class="leaf leaf-2"></div>
+                    <div class="leaf leaf-3"></div>
+                    <div class="leaf leaf-4"></div>
+                  </div>
+                  <div class="enclosure">
+                    <div class="enclosure-label">IoT Sensor Node</div>
+                  </div>
+                </div>
+
+                <div class="water-area">
+                  <div class="water-surface"></div>
+                  <div class="water-label">Tidal Water Zone (Semi-Diurnal 0.2m – 0.7m)</div>
+                </div>
+
+                <div class="ground-area">
+                  <div class="root root-left"></div>
+                  <div class="root root-right"></div>
+                  <div class="servo-box">
+                    <span class="servo-label">Servo 0° / 90°</span>
+                  </div>
+                  <div id="anchorRod" class="anchor-rod"></div>
+                  <div class="mud-label">Estuarine Sediment Bed</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="alert-panel">
+              <span class="alert-icon">ℹ️</span>
+              <div>
+                <strong>Operational Logic</strong>
+                <p id="alertMessage">
+                  Mangrove plant stable. Environmental conditions within safety limits. Anchor will deploy if plant tilt
+                  exceeds 15.0°.
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ====================================================
+             8. SIMULATOR READING VIEW (Clearly designated as Demo)
+        ===================================================== -->
+        <section id="view-simulator" class="app-view" aria-labelledby="simulatorHeading">
+
+          <div class="view-section-card">
+            <div class="view-section-header">
+              <div>
+                <span class="section-badge sim-pill">🎛️ VIRTUAL TESTING CONSOLE</span>
+                <h2 id="simulatorHeading">Simulator Reading</h2>
+                <p class="section-description">Virtual sensor generation tool for software demonstrations and laboratory
+                  presentations.</p>
+              </div>
+              <div class="simulator-badge-container">
+                <span id="simModePill" class="sim-mode-pill">
+                  🟡 SIMULATION MODE
+                </span>
+              </div>
+            </div>
+
+            <!-- Prominent Simulation Notice Banner -->
+            <div id="simBanner" class="simulation-banner">
+              <div class="simulation-banner-content">
+                <div class="banner-badge-row">
+                  <span id="simBannerIcon" class="warning-icon">⚠️</span>
+                  <strong id="simBannerTitle" class="banner-main-title">SIMULATED DATA — NOT FROM HARDWARE</strong>
+                </div>
+                <p id="simBannerSubtext" class="banner-subtext">
+                  All telemetry values in this panel are generated by the software simulator for testing and
+                  demonstration purposes.
+                  <strong>Data Source:</strong> Virtual Generator (Software Only). No physical hardware sensors or
+                  Arduino boards are connected.
+                </p>
+              </div>
+
+              <!-- Simulator Controls: Start / Stop -->
+              <div class="simulator-controls">
+                <button id="startSimBtn" class="sim-ctrl-btn btn-start" type="button" title="Start periodic simulation">
+                  <span>▶ Start Simulation</span>
+                </button>
+                <button id="stopSimBtn" class="sim-ctrl-btn btn-stop active" type="button"
+                  title="Stop periodic simulation">
+                  <span>⏹ Stop Simulation</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Simulator Telemetry Grid (6 Metrics) -->
+            <div class="simulator-grid">
+              <!-- 1. Tilt Angle -->
+              <div class="sim-card" id="simCardTilt">
+                <div class="sim-card-header">
+                  <span class="sim-card-icon">📐</span>
+                  <span class="sim-source-tag">SIMULATED</span>
+                </div>
+                <div class="sim-card-body">
+                  <span class="sim-label">Tilt Angle</span>
+                  <h3 id="simTiltAngle" class="sim-value">4.2°</h3>
+                  <small class="sim-hint">Safe range &lt; 15.0°</small>
+                </div>
+              </div>
+
+              <!-- 2. Soil Moisture -->
+              <div class="sim-card" id="simCardSoil">
+                <div class="sim-card-header">
+                  <span class="sim-card-icon">💧</span>
+                  <span class="sim-source-tag">SIMULATED</span>
+                </div>
+                <div class="sim-card-body">
+                  <span class="sim-label">Soil Moisture</span>
+                  <h3 id="simSoilMoisture" class="sim-value">67%</h3>
+                  <small class="sim-hint">Optimum mangrove saturation</small>
+                </div>
+              </div>
+
+              <!-- 3. Temperature -->
+              <div class="sim-card" id="simCardTemp">
+                <div class="sim-card-header">
+                  <span class="sim-card-icon">🌡️</span>
+                  <span class="sim-source-tag">SIMULATED</span>
+                </div>
+                <div class="sim-card-body">
+                  <span class="sim-label">Temperature</span>
+                  <h3 id="simTemperature" class="sim-value">29.5°C</h3>
+                  <small class="sim-hint">Coastal ambient temperature</small>
+                </div>
+              </div>
+
+              <!-- 4. Humidity -->
+              <div class="sim-card" id="simCardHum">
+                <div class="sim-card-header">
+                  <span class="sim-card-icon">🌫️</span>
+                  <span class="sim-source-tag">SIMULATED</span>
+                </div>
+                <div class="sim-card-body">
+                  <span class="sim-label">Humidity</span>
+                  <h3 id="simHumidity" class="sim-value">78%</h3>
+                  <small class="sim-hint">Relative atmospheric moisture</small>
+                </div>
+              </div>
+
+              <!-- 5. Servo Position -->
+              <div class="sim-card" id="simCardServo">
+                <div class="sim-card-header">
+                  <span class="sim-card-icon">⚙️</span>
+                  <span class="sim-source-tag">SIMULATED</span>
+                </div>
+                <div class="sim-card-body">
+                  <span class="sim-label">Servo Position</span>
+                  <h3 id="simServoPosition" class="sim-value">0°</h3>
+                  <small class="sim-hint">Standby: 0° • Deployed: 90°</small>
+                </div>
+              </div>
+
+              <!-- 6. Anchor Status -->
+              <div class="sim-card" id="simCardAnchor">
+                <div class="sim-card-header">
+                  <span class="sim-card-icon">⚓</span>
+                  <span class="sim-source-tag">SIMULATED</span>
+                </div>
+                <div class="sim-card-body">
+                  <span class="sim-label">Anchor Status</span>
+                  <h3 id="simAnchorStatus" class="sim-value sim-status-normal">Normal</h3>
+                  <small class="sim-hint">Sub-surface mechanical state</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Simulator Meta Status -->
+            <div class="sim-footer-meta">
+              <div class="sim-live-status">
+                <span class="sim-pulse-dot" id="simPulseDot"></span>
+                <span id="simStatusText">Simulation Stopped</span>
+              </div>
+              <div class="sim-db-status" id="simDbStatusContainer">
+                <span class="sim-db-dot" id="simDbDot">💾</span>
+                <span id="simDbStatusText" class="sim-db-status-text">Ready to record simulated telemetry</span>
+              </div>
+              <div class="sim-last-update">
+                <span>Last telemetry update: </span>
+                <strong id="simLastUpdate">Stopped</strong>
+              </div>
+            </div>
+
+            <!-- Hardware / Simulation Architecture & Verification Panel -->
+            <div class="hw-arch-card">
+              <div class="hw-arch-header">
+                <div class="hw-arch-title-group">
+                  <span class="hw-arch-badge">Data Architecture</span>
+                  <h3>🔌 Hardware / Simulation Telemetry Pipeline</h3>
+                </div>
+                <div class="hw-arch-status-pill" id="hwPipelineStatus">
+                  <span id="hwPipelineDot">⚪</span>
+                  <strong id="hwPipelineMode">HARDWARE DISCONNECTED</strong>
+                </div>
+              </div>
+
+              <p class="hw-arch-desc">
+                The telemetry pipeline enforces strict data isolation between <strong>SIMULATION</strong> and
+                <strong>HARDWARE</strong>. Real hardware readings are never spoofed, and simulated data is never
+                presented as authentic hardware telemetry.
+              </p>
+
+              <!-- Interactive Mode Verification Controls -->
+              <div class="hw-test-actions">
+                <span class="hw-test-label">Hardware Architecture Verification:</span>
+                <button id="testConnectHardwareBtn" class="sim-ctrl-btn btn-hw-connect" type="button"
+                  title="Test authentic HARDWARE mode transition via backend route">
+                  <span>🔌 Test Hardware Connect</span>
+                </button>
+                <button id="testDisconnectHardwareBtn" class="sim-ctrl-btn btn-hw-disconnect" type="button"
+                  title="Test return to SIMULATION mode">
+                  <span>⚡ Test Disconnect</span>
+                </button>
+              </div>
+
+              <div class="hw-arch-grid">
+                <!-- Telemetry Payload Schema -->
+                <div class="hw-arch-subcard">
+                  <h4>📋 Unified 8-Field Telemetry Payload</h4>
+                  <p class="hw-subcard-hint">Real-time data returned from <code>GET /api/telemetry</code>:</p>
+                  <pre id="telemetryJsonView" class="telemetry-json">Loading telemetry structure...</pre>
+                </div>
+
+                <!-- ESP8266 Hardware Integration Architecture -->
+                <div class="hw-arch-subcard">
+                  <h4>🛠️ ESP8266 Wi-Fi Hardware Integration</h4>
+                  <p class="hw-subcard-hint">How physical ESP8266 links to this pipeline:</p>
+                  <ul class="hw-guide-list">
+                    <li><strong>1. Ingestion Route:</strong> <code>POST /api/hardware/data</code></li>
+                    <li><strong>2. Source Verification:</strong> Enforced as <code>"HARDWARE"</code> by the backend ingest handler.</li>
+                    <li><strong>3. Heartbeat Watchdog:</strong> 30-second automatic disconnection timeout if telemetry stops.</li>
+                    <li><strong>4. Direct Wi-Fi Link:</strong> ESP8266 connects directly to FastAPI backend over local network HTTP.</li>
+                    <li><strong>5. Sensor &amp; Actuator Array:</strong> Tilt sensor, Soil-Moisture sensor, and Root Anchor Servo.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ====================================================
+             9. ALERTS VIEW
+        ===================================================== -->
+        <section id="view-alerts" class="app-view" aria-labelledby="alertsHeading">
+
+          <div class="view-section-card">
+            <div class="view-section-header">
+              <div>
+                <span class="section-badge">INCIDENT DISPATCH</span>
+                <h2 id="alertsHeading">🚨 Environmental Alerts &amp; Incident Log</h2>
+                <p class="section-description">Real-time threshold monitoring and safety notifications for coastal
+                  mangrove assets.</p>
+              </div>
+              <span class="status-chip success">All Channels Nominal</span>
+            </div>
+
+            <div class="alert-status-banner nominal">
+              <span class="alert-banner-icon">✔</span>
+              <div class="alert-banner-text">
+                <strong>No Active Hardware Alerts</strong>
+                <p>The monitoring station reports all parameters within standard baseline safety envelopes.</p>
+              </div>
+            </div>
+
+            <!-- Threshold Standards Card -->
+            <div class="thresholds-card">
+              <h4>Active Environmental Threshold Boundaries</h4>
+              <div class="thresholds-grid">
+                <div class="threshold-item">
+                  <div class="thresh-label">Critical Tilt Angle</div>
+                  <div class="thresh-val">&gt; 15.0°</div>
+                  <small>Automated Servo Anchor Deployment</small>
+                </div>
+                <div class="threshold-item">
+                  <div class="thresh-label">Desiccation Moisture</div>
+                  <div class="thresh-val">&lt; 40.0%</div>
+                  <small>High Rhizosphere Dehydration Risk</small>
+                </div>
+                <div class="threshold-item">
+                  <div class="thresh-label">Thermal Stress</div>
+                  <div class="thresh-val">&gt; 38.0°C</div>
+                  <small>Canopy Evapotranspiration Warning</small>
+                </div>
+                <div class="threshold-item">
+                  <div class="thresh-label">Hyper-Salinity</div>
+                  <div class="thresh-val">&gt; 35.0 ppt</div>
+                  <small>Osmotic Stress Advisory</small>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ====================================================
+             10. REPORTS VIEW
+        ===================================================== -->
+        <section id="view-reports" class="app-view" aria-labelledby="reportsHeading">
+
+          <div class="view-section-card">
+            <div class="view-section-header">
+              <div>
+                <span class="section-badge">COMPLIANCE &amp; AUDIT</span>
+                <h2 id="reportsHeading">📑 Environmental &amp; MRV Reports</h2>
+                <p class="section-description">Export verified telemetry dossiers, baseline environmental reports, and
+                  carbon credit audits.</p>
+              </div>
+              <span class="status-chip neutral">Exports Ready</span>
+            </div>
+
+            <!-- Report Templates -->
+            <div class="report-templates-grid">
+              <div class="report-card">
+                <div class="report-icon">📊</div>
+                <h4>Telemetry Audit History (CSV)</h4>
+                <p>Full raw database export of all recorded hardware and simulation telemetry rows with cryptographic
+                  timestamps.</p>
+                <button type="button" class="btn-report-export" onclick="exportHistoryCsv()">
+                  <span>📥 Download Telemetry CSV</span>
+                </button>
+              </div>
+
+              <div class="report-card">
+                <div class="report-icon">📜</div>
+                <h4>Pichavaram Baseline Summary (PDF)</h4>
+                <p>Official scientific environmental baseline profile compiled from Ramsar and MSSRF monographs.</p>
+                <button type="button" class="btn-report-export"
+                  onclick="alert('Preparing official Pichavaram baseline report for download.')">
+                  <span>📥 Export Environmental PDF</span>
+                </button>
+              </div>
+
+              <div class="report-card">
+                <div class="report-icon">🌿</div>
+                <h4>Blue Carbon MRV Ledger</h4>
+                <p>Standardized carbon stock calculations and verified credit tokenization report for institutional
+                  review.</p>
+                <button type="button" class="btn-report-export"
+                  onclick="alert('Preparing Blue Carbon MRV ledger for export.')">
+                  <span>📥 Export Carbon Ledger</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+      </main>
+
+      <!-- Clean Professional Footer -->
+      <footer class="app-footer">
+        <div class="footer-content">
+          <p><strong>Smart Mangrove System</strong> — IoT-Driven Smart MRV and Blue Carbon Registry Platform</p>
+          <small>Pichavaram Estuarine Wetland, Cuddalore, Tamil Nadu • Ramsar Site No. 2475 © 2026</small>
+        </div>
+      </footer>
+
+    </div>
+
+  </div>
+
+  <!-- JavaScript -->
+  <script src="script.js"></script>
+
+</body>
+
+</html>
